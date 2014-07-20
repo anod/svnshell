@@ -5,7 +5,7 @@ Based on https://gist.github.com/shpoont/4055511
 
 ### Example
 ```bash
-   [blackbox:~/work] john trunk [M] 34673 $
+   [Alexs-MacBook-Air:~/dev/svnshell] alex trunk 3 $
 ```
  
 ### Requirements
