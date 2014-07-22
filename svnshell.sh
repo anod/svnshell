@@ -71,7 +71,7 @@ _update_prompt () {
 		
 		svn_version=`svnversion`
         branch_revision=$svn_version
-		branch_status=`svn status| cut -c 1-7 | grep -ve '^---' | grep --color=never -o . | sort -u | tr -d " \n"`
+		branch_status=`svn status -q | cut -c 1-7 | grep -ve '^---' | grep --color=never -o . | sort -u | tr -d " \n"`
 		if [[ "$svn_version" =~ ([0-9:]+)([MSP]+)? ]] ;
 		then
 		    branch_revision=${BASH_REMATCH[1]}
