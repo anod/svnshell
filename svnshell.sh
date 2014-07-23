@@ -100,6 +100,20 @@ _update_prompt () {
 
 }
 
+function _param_to_branch() {
+	local branch=$1
+    if [ -n "$branch" ] ; then 
+		if [ "$branch" == "trunk" ]; then
+			branch="trunk"
+		elif [[ "$branch" == *\/* ]]; then
+			branch=${branch#'^/'}
+		else
+			branch="branches/$branch"
+		fi
+	fi
+	echo "$branch"
+}
+
 function _extract_branch_name() {
 	local branch=$1
 	if  [[ $branch == branches* ]] ;
@@ -117,7 +131,7 @@ function _switch() {
 	local branch=$1
     if [ -n "$branch" ] ; then 
 		if [ "$branch" == "-" ]; then
-			if  ["$SVNSHELL_BRANCH_PREV" != ""] && [ "$SVNSHELL_BRANCH_CURRENT" != "$SVNSHELL_BRANCH_PREV" ] ;
+			if  [ -n "$SVNSHELL_BRANCH_PREV" ] && [ "$SVNSHELL_BRANCH_CURRENT" != "$SVNSHELL_BRANCH_PREV" ];
 			then
 				svn switch ^/$SVNSHELL_BRANCH_PREV "${*:2}"
 			fi
@@ -150,23 +164,26 @@ function _commit() {
 }
 
 function _mergelog() {
-	local shortbransh=$(_extract_branch_name $SVNSHELL_BRANCH_CURRENT)
+	local branch=$(_param_to_branch $1)
+    if [ -z "$branch" ] ; then 
+		branch=$SVNSHELL_BRANCH_CURRENT
+	fi
+	local shortbranch=$(_extract_branch_name $branch)
+	
 	local message=
 	local author=
 	local rev=
 	local date=
 	local state=0
 	
-	#echo "Branch: $SVNSHELL_BRANCH_CURRENT"
-	
-	svn log --limit 10 "$@" | while read line
+	svn log --limit 10 ^/$branch | while read line
 	do
 		if [[ "$line" == ---* ]]; then
 			
 			if [ "$state" -eq 3 ]; then
 				echo "------------- $author [$date] -----------------------------------"
-				echo "merge -c $rev ^/$SVNSHELL_BRANCH_CURRENT ."
-				echo "commit -m \"Merge from $shortbransh: $message\"" 
+				echo "merge -c $rev ^/$branch ."
+				echo "commit -m \"Merge from $shortbranch: $message\"" 
 			fi
 			
 			state=1
@@ -196,7 +213,7 @@ function _mergelog() {
 	# show last
 	if [ "$state" -eq 3 ]; then
 		echo "------------- $author [$date] -----------------------------------"
-		echo "merge -c $rev ^/$SVNSHELL_BRANCH_CURRENT ."
+		echo "merge -c $rev ^/$branch ."
 		echo 'commit -m "Merge from $shortbransh: $message"' 
 	fi
 }
