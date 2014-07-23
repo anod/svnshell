@@ -150,10 +150,14 @@ function _switch() {
 function _branch() {
 	local branch=$1
 	local message=$2
-    if [ -n "$message" ] ; then 
-		svn copy . ^/branches/"$branch" -m "$message"
+    if [ -z "$branch" ] ; then 
+		svn ls ^/branches/ --verbose | sort
 	else
-		svn copy . ^/branches/"$branch"
+		if [ -n "$message" ] ; then 
+			svn copy . ^/branches/"$branch" -m "$message"
+		else
+			svn copy . ^/branches/"$branch"
+		fi
 	fi
 }
 
