@@ -201,6 +201,21 @@ function _mergelog() {
 	fi
 }
 
+function _diff() {
+	hash colordiff 2>/dev/null
+	local RETVAL=$?
+	if [ $RETVAL -eq 0 ]; then
+		svn diff "$@" | colordiff
+	else
+		svn diff "$@"
+	fi
+}
+
+function _intro() {
+	hash colordiff 2>/dev/null || { echo "To display diff with colors install colordiff."; }
+
+}
+
 function _exit() {
 	export PROMPT_COMMAND=
 	export PS1=$PS1_ORIGINAL
@@ -252,5 +267,7 @@ alias merge="svn merge "
 alias branch="_branch "
 alias revert="svn revert "
 alias revertall="svn revert --depth=infinity ."
-alias di="svn diff "
+alias di="_diff "
 alias exit="_exit "
+
+_intro
