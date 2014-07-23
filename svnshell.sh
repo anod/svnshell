@@ -60,6 +60,12 @@ _update_prompt () {
 		prefix='Relative URL: ^/' 
 		branch=${branch#$prefix}
 
+		if  [ "$branch" != "$SVNSHELL_BRANCH_CURRENT" ] ;
+		then
+			export SVNSHELL_BRANCH_PREV=$SVNSHELL_BRANCH_CURRENT
+			export SVNSHELL_BRANCH_CURRENT=$branch
+		fi
+
 		if  [[ $branch == branches* ]] ;
 		then
 		    branch=${branch#'branches/'}
@@ -87,14 +93,119 @@ _update_prompt () {
 	    full_prompt="$_prompt $u$branch$p"
 	    export PS1="\[\e]0;\u@\h:\w\\a\]$full_prompt "
 	else
+		export SVNSHELL_BRANCH_CURRENT=
+		export SVNSHELL_BRANCH_PREV=
 	    export PS1=$PS1_ORIGINAL
     fi
 
 }
 
+function _extract_branch_name() {
+	local branch=$1
+	if  [[ $branch == branches* ]] ;
+	then
+	    branch=${branch#'branches/'}
+	fi
+	if  [[ $branch == tags* ]] ;
+	then
+	    branch=${branch#'tags/'}
+	fi
+	echo "$branch"
+}
+
+function _switch() {
+	local branch=$1
+    if [ -n "$branch" ] ; then 
+		if [ "$branch" == "-" ]; then
+			if  ["$SVNSHELL_BRANCH_PREV" != ""] && [ "$SVNSHELL_BRANCH_CURRENT" != "$SVNSHELL_BRANCH_PREV" ] ;
+			then
+				svn switch ^/$SVNSHELL_BRANCH_PREV "${*:2}"
+			fi
+		elif [ "$branch" == "trunk" ]; then
+			svn switch ^/trunk "${*:2}"
+		elif [[ "$branch" == *\/* ]]; then
+			svn switch ^/"$branch" "${*:2}"
+		else
+			svn switch ^/branches/"$branch" "${*:2}"
+		fi
+	else
+		svn switch "$@"
+	fi
+}
+
+function _branch() {
+	local branch=$1
+	local message=$2
+    if [ -n "$message" ] ; then 
+		svn copy . ^/branches/"$branch" -m "$message"
+	else
+		svn copy . ^/branches/"$branch"
+	fi
+}
+
+function _commit() {
+	svn commit "$@"
+	local RETVAL=$?
+	[ $RETVAL -eq 0 ] && svn update
+}
+
+function _mergelog() {
+	local shortbransh=$(_extract_branch_name $SVNSHELL_BRANCH_CURRENT)
+	local message=
+	local author=
+	local rev=
+	local date=
+	local state=0
+	
+	#echo "Branch: $SVNSHELL_BRANCH_CURRENT"
+	
+	svn log --limit 10 "$@" | while read line
+	do
+		if [[ "$line" == ---* ]]; then
+			
+			if [ "$state" -eq 3 ]; then
+				echo "------------- $author [$date] -----------------------------------"
+				echo "merge -c $rev ^/$SVNSHELL_BRANCH_CURRENT ."
+				echo "commit -m \"Merge from $shortbransh: $message\"" 
+			fi
+			
+			state=1
+		elif [ "$state" -eq 1 ]; then
+			# r6733 | alex | 2014-07-07 16:09:21 +0300 (Mon, 07 Jul 2014) | 1 line
+			state=2
+			local OLD_IFS="$IFS"
+			IFS=' | '
+			local data=( $line )
+			IFS="$OLD_IFS"
+
+			rev=${data[0]#r}
+			author=${data[1]}
+			date="${data[2]} ${data[3]}"
+			message=
+
+		elif [ "$state" -eq 2 ]; then
+			#empty line
+			state=3
+		elif [ "$state" -eq 3 ]; then
+			#empty line
+			if [ -n "$line" ]; then
+			    message="$message $line"
+			fi
+		fi
+	done
+	# show last
+	if [ "$state" -eq 3 ]; then
+		echo "------------- $author [$date] -----------------------------------"
+		echo "merge -c $rev ^/$SVNSHELL_BRANCH_CURRENT ."
+		echo 'commit -m "Merge from $shortbransh: $message"' 
+	fi
+}
+
 function _exit() {
 	export PROMPT_COMMAND=
 	export PS1=$PS1_ORIGINAL
+	unset SVNSHELL_BRANCH_CURRENT
+	unset SVNSHELL_BRANCH_PREV
 	unalias add
 	unalias up
 	unalias update
@@ -104,46 +215,23 @@ function _exit() {
 	unalias commit
 	unalias info
 	unalias log
+	unalias mergelog
 	unalias status
 	unalias st
 	unalias stat
 	unalias merge
 	unalias branch
+	unalias revert
+	unalias revertall
+	unalias di
 	unalias exit
-}
-
-function _switch() {
-	branch=$1
-    if [ -n "$branch" ] ; then 
-		if [ "$branch" == "trunk" ]; then
-			svn switch ^/trunk "${*:2}"
-		else
-			# full qualified apth
-			if [[ "$branch" == *\/* ]]
-			then
-			 	svn switch ^/"$branch" "${*:2}"
-			else
-				svn switch ^/branches/"$branch" "${*:2}"
-			fi
-		fi
-	else
-		svn switch "$@"
-	fi
-}
-
-function _branch() {
-	branch=$1
-	message=$2
-    if [ -n "$message" ] ; then 
-		svn copy . ^/branches/"$branch" -m "$message"
-	else
-		svn copy . ^/branches/"$branch"
-	fi
 }
 
 PROMPT_COMMAND='_update_prompt'
 export PROMPT_COMMAND
 export PS1_ORIGINAL=$PS1
+export SVNSHELL_BRANCH_CURRENT=
+export SVNSHELL_BRANCH_PREV=
 
 # Define shortcuts
 
@@ -152,13 +240,17 @@ alias up="svn update "
 alias update="svn update "
 alias sw="_switch "
 alias switch="svn switch "
-alias ci="svn commit "
-alias commit="svn commit "
+alias ci="_commit "
+alias commit="_commit "
 alias info="svn info "
 alias log="svn log --limit 10 "
+alias mergelog="_mergelog "
 alias status="svn status "
 alias stat="svn status "
 alias st="svn status "
 alias merge="svn merge "
 alias branch="_branch "
+alias revert="svn revert "
+alias revertall="svn revert --depth=infinity ."
+alias di="svn diff "
 alias exit="_exit "
