@@ -120,6 +120,15 @@ Way 2 - Add alias to .bash_profile
   $ revert
   $ revertall
   
+  # Log with merge info
+  $ mergelog
+
+  # Merge branch into wokring copy
+  $ mb <BranchName>
+ 
+  # Reintegrate branch
+  $ reintegrate <BranchName>
+
   # Other:
   $ add
   $ info
