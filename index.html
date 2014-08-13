@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="SVN Shell : Bash extension for SVN">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>SVN Shell</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/anod/svnshell">View on GitHub</a>
+
+          <h1 id="project_title">SVN Shell</h1>
+          <h2 id="project_tagline">Bash extension for SVN</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/anod/svnshell/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/anod/svnshell/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="svn-shell" class="anchor" href="#svn-shell"><span class="octicon octicon-link"></span></a>SVN Shell</h1>
+
+<p>svnshell - addon for BASH shel which improves CLI with relevant information about current subversion repository and provides shortcuts for common comands.</p>
+
+<p>Based on <a href="https://gist.github.com/shpoont/4055511">https://gist.github.com/shpoont/4055511</a></p>
+
+<h3>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h3>
+
+<div class="highlight highlight-bash"><pre><span class="c"># Enter svnshell </span>
+alex@Alexs-Air:~/dev/svnshell<span class="nv">$ </span>svnshell
+
+<span class="o">[</span>alexs-air:~/dev/svnshell<span class="o">]</span> alex trunk <span class="m">9</span> <span class="err">$</span>
+
+<span class="c"># create a branch </span>
+<span class="o">[</span>alexs-air:~/dev/svnshell<span class="o">]</span> alex trunk <span class="m">9</span> <span class="nv">$ </span>branch TestBranch <span class="s2">"Branch for tests"</span>
+Adding copy of        .
+
+Committed revision 11.
+
+<span class="c"># Switch to a branch</span>
+<span class="o">[</span>alexs-air:~/dev/svnshell<span class="o">]</span> alex trunk <span class="m">9</span> <span class="nv">$ </span>sw TestBranch
+U    README.md
+U    svnshell.sh
+Updated to revision 11.
+<span class="o">[</span>alexs-air:~/dev/svnshell<span class="o">]</span> alex TestBranch <span class="m">11</span> <span class="err">$</span>
+
+<span class="c"># Switch to a previous branch</span>
+<span class="o">[</span>alexs-air:~/dev/svnshell<span class="o">]</span> alex TestBranch <span class="m">11</span> <span class="nv">$ </span>sw -
+U    README.md
+U    svnshell.sh
+Updated to revision 11.
+<span class="o">[</span>alexs-air:~/dev/svnshell<span class="o">]</span> alex trunk <span class="m">11</span> <span class="err">$</span>
+
+ <span class="c"># List branches</span>
+<span class="o">[</span>alexs-air:~/dev/svnshell<span class="o">]</span> alex trunk <span class="m">11</span> <span class="nv">$ </span>branch
+     <span class="m">11</span> alex.gav              Jul <span class="m">24</span> 14:32 ./
+     <span class="m">11</span> alex.gav              Jul <span class="m">24</span> 14:32 TestBranch/
+
+<span class="c"># Show log for merge per revision</span>
+<span class="o">[</span>alexs-air:~/dev/svnshell<span class="o">]</span> alex TestBranch <span class="m">11</span> <span class="nv">$ </span>mergelog trunk
+------------- alex.gavrishev <span class="o">[</span>2014-07-23 17:24:29<span class="o">]</span> -----------------------------------
+merge -c <span class="m">9</span> ^/trunk .
+commit -m <span class="s2">"Merge from trunk:  list branches when executing branch whithout"</span>
+------------- alex.gavrishev <span class="o">[</span>2014-07-23 16:41:30<span class="o">]</span> -----------------------------------
+merge -c <span class="m">8</span> ^/trunk .
+commit -m <span class="s2">"Merge from trunk:  mergelog receive a branch name as prameter"</span>
+<span class="c">#...</span>
+
+<span class="c">#Show colordiff for revision</span>
+<span class="o">[</span>alexs-air:~/dev/svnshell<span class="o">]</span> alex TestBranch <span class="m">11</span> <span class="nv">$ </span>di -c 8
+Index: svnshell.sh
+<span class="o">===================================================================</span>
+--- svnshell.sh <span class="o">(</span>revision 7<span class="o">)</span>
++++ svnshell.sh <span class="o">(</span>revision 8<span class="o">)</span>
+<span class="c">#....</span>
+
+</pre></div>
+
+<h3>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h3>
+
+<p>svn 1.7+, Standard repository layout</p>
+
+<h3>
+<a name="how-to-use" class="anchor" href="#how-to-use"><span class="octicon octicon-link"></span></a>How to use</h3>
+
+<p>Way 1 - To enable execute:</p>
+
+<div class="highlight highlight-bash"><pre>    <span class="nv">$ </span><span class="nb">source </span>svnshell.sh
+    <span class="nv">$ </span><span class="nb">cd</span> /path/to/svn/checkout
+</pre></div>
+
+<p>Way 2 - Add alias to .bash_profile</p>
+
+<div class="highlight highlight-bash"><pre>    <span class="nb">alias </span><span class="nv">svnshell</span><span class="o">=</span><span class="s2">"source svnshell.sh"</span>
+</pre></div>
+
+<p>Execute:</p>
+
+<div class="highlight highlight-bash"><pre>    <span class="nv">$ </span>svnshell
+    <span class="nv">$ </span><span class="nb">cd</span> /path/to/svn/checkout
+</pre></div>
+
+<h3>
+<a name="format" class="anchor" href="#format"><span class="octicon octicon-link"></span></a>Format</h3>
+
+<pre><code>   [host:cwd] user svn-branch [svn-status] rev stdprompt
+     |    |    |      |            |        |    |        
+     |    |    |      |            |        |    `-----&gt;  "" for regular user, "$" for root. Green if 
+     |    |    |      |            |        |             last command executed without errors, red otherwise.
+     |    |    |      |            |        |             
+     |    |    |      |            |        `----------&gt;  Current revision (svnversion output)
+     |    |    |      |            |                     
+     |    |    |      |            `-------------------&gt;  Summary of svn status codes
+     |    |    |      |                                  
+     |    |    |      `---------------------------------&gt;  Current branch.
+     |    |    |                                           
+     |    |    `----------------------------------------&gt;  Currently logged in user.
+     |    |                                                
+     |    `---------------------------------------------&gt;  Current working directory.
+     |                                                     
+     `--------------------------------------------------&gt;  Hostname of current machine.
+</code></pre>
+
+<h3>
+<a name="command-alises" class="anchor" href="#command-alises"><span class="octicon octicon-link"></span></a>Command alises</h3>
+
+<div class="highlight highlight-bash"><pre>
+  <span class="c"># Preform update:</span>
+  <span class="nv">$ </span>up
+  <span class="nv">$ </span>update
+
+  <span class="c"># Switch branch:</span>
+  <span class="nv">$ </span>sw BranchName
+  <span class="nv">$ </span>sw trunk
+  <span class="nv">$ </span>switch ^/trunk
+
+  <span class="c"># Commit changes:</span>
+  <span class="nv">$ </span>ci
+  <span class="nv">$ </span>commit
+
+  <span class="c"># Create branch:</span>
+  <span class="nv">$ </span>branch &lt;BranchName&gt; <span class="s2">"&lt;Message&gt;"</span>
+
+  <span class="c"># List branches</span>
+  <span class="nv">$ </span>branch
+
+  <span class="c"># Show diff (colordiff)</span>
+  <span class="nv">$ </span>di
+
+  <span class="c"># Revert changes</span>
+  <span class="nv">$ </span>revert
+  <span class="nv">$ </span>revertall
+
+  <span class="c"># Log with merge info</span>
+  <span class="nv">$ </span>mergelog
+
+  <span class="c"># Merge branch into wokring copy</span>
+  <span class="nv">$ </span>mb &lt;BranchName&gt;
+
+  <span class="c"># Reintegrate branch</span>
+  <span class="nv">$ </span>reintegrate &lt;BranchName&gt;
+
+  <span class="c"># Other:</span>
+  <span class="nv">$ </span>add
+  <span class="nv">$ </span>info
+  <span class="nv">$ </span>log
+  <span class="nv">$ </span>status
+  <span class="nv">$ </span>st
+  <span class="nv">$ </span>stat
+  <span class="nv">$ </span>merge
+  <span class="nv">$ </span><span class="nb">exit</span>
+</pre></div>
+
+<h3>
+<a name="author" class="anchor" href="#author"><span class="octicon octicon-link"></span></a>Author</h3>
+
+<p>Alex Gavrishev <a href="mailto:alex.gavrishev@gmail.com">alex.gavrishev@gmail.com</a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">SVN Shell maintained by <a href="https://github.com/anod">anod</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-1633675-4");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
