@@ -1,6 +1,6 @@
 # SVN Shell
 
-svnshell - addon for BASH which improves CLI with relveant subversion information and shortcuts for common comands.
+svnshell - addon for BASH shel which improves CLI with relevant information about current subversion repository and provides shortcuts for common comands.
 
 Based on https://gist.github.com/shpoont/4055511
 
