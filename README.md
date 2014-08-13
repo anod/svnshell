@@ -6,6 +6,8 @@ Based on https://gist.github.com/shpoont/4055511
 
 ### Example
 ```bash
+alex@Alexs-Air:~/dev/svnshell$ svnshell
+
 [alexs-air:~/dev/svnshell] alex trunk 9 $
 
 # create a branch 
