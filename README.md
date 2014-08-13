@@ -6,6 +6,7 @@ Based on https://gist.github.com/shpoont/4055511
 
 ### Example
 ```bash
+# Enter svnshell 
 alex@Alexs-Air:~/dev/svnshell$ svnshell
 
 [alexs-air:~/dev/svnshell] alex trunk 9 $
