@@ -1,6 +1,8 @@
 # SVN Shell
 
-Improved bash with subversion information. Based on https://gist.github.com/shpoont/4055511
+svnshell - addon for BASH which improves CLI with relveant subversion information and shortcuts for common comands.
+
+Based on https://gist.github.com/shpoont/4055511
 
 ### Example
 ```bash
