@@ -57,7 +57,7 @@ Index: svnshell.sh
 ```
  
 ### Requirements
-   svn 1.7+
+   svn 1.7+, Standard repository layout
 
 ### How to use
 Way 1 - To enable execute:
