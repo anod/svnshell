@@ -103,6 +103,7 @@ _update_prompt () {
 function _param_to_branch() {
 	local branch=$1
     if [ -n "$branch" ] ; then 
+		branch=${branch%/}
 		if [ "$branch" == "trunk" ]; then
 			branch="trunk"
 		elif [[ "$branch" == *\/* ]]; then
@@ -135,12 +136,9 @@ function _switch() {
 			then
 				svn switch ^/$SVNSHELL_BRANCH_PREV "${*:2}"
 			fi
-		elif [ "$branch" == "trunk" ]; then
-			svn switch ^/trunk "${*:2}"
-		elif [[ "$branch" == *\/* ]]; then
-			svn switch ^/"$branch" "${*:2}"
 		else
-			svn switch ^/branches/"$branch" "${*:2}"
+			branch=$(_param_to_branch $branch)
+			svn switch ^/"$branch" "${*:2}"
 		fi
 	else
 		svn switch "$@"
@@ -165,6 +163,19 @@ function _commit() {
 	svn commit "$@"
 	local RETVAL=$?
 	[ $RETVAL -eq 0 ] && svn update
+}
+
+function _merge_branch() {
+	local banch=$(_param_to_branch $1)
+    if [ -z "$banch" ] ; then 
+		echo "mb <BranchName>"
+	else 
+		svn merge ^/"$banch" "${*:2}"
+	fi
+}
+
+function _reintegrate() {
+	_merge_branch "$1" "--reintegrate"
 }
 
 function _mergelog() {
@@ -233,8 +244,15 @@ function _diff() {
 }
 
 function _intro() {
+	echo "Welcome to SVNSHELL"
+	_help
+	echo ""
 	hash colordiff 2>/dev/null || { echo "To display diff with colors install colordiff."; }
+}
 
+function _help() {
+	echo "    Actions    : up | sw <BranchName> | sw - | ci -m \"<Message>\" | branch <BranchName> \"<Message>\" | mb <BranchName> | reintegrate | revert(all) |"
+	echo "    Information: st | branch | di | log | mergelog"
 }
 
 function _exit() {
@@ -260,6 +278,9 @@ function _exit() {
 	unalias revert
 	unalias revertall
 	unalias di
+	unalias mb
+	unalias reintegrate
+	unalias help
 	unalias exit
 }
 
@@ -289,6 +310,9 @@ alias branch="_branch "
 alias revert="svn revert "
 alias revertall="svn revert --depth=infinity ."
 alias di="_diff "
+alias mb="_merge_branch "
+alias reintegrate="_reintegrate "
+alias help="_help "
 alias exit="_exit "
 
 _intro

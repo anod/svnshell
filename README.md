@@ -68,6 +68,15 @@ Way 2:
   # Create branch:
   $ branch <BranchName> "<Message>"
 
+  # Log with merge info
+  $ mergelog
+
+  # Merge branch into wokring copy
+  $ mb <BranchName>
+ 
+  # Reintegrate branch
+  $ reintegrate <BranchName>
+
   # Other:
   $ add
   $ info
