@@ -16,7 +16,6 @@ alex@Alexs-Air:~/dev/svnshell$ svnshell
 Adding copy of        .
 
 Committed revision 11.
-[alexs-air:~/dev/svnshell] alex trunk 9 $
 
 # Switch to a branch
 [alexs-air:~/dev/svnshell] alex trunk 9 $ sw TestBranch
