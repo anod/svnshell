@@ -167,10 +167,12 @@ function _commit() {
 
 function _merge_branch() {
 	local banch=$(_param_to_branch $1)
-    if [ -z "$banch" ] ; then 
+	if [ -z "$banch" ] ; then
 		echo "mb <BranchName>"
 	else 
 		svn merge ^/"$banch" "${*:2}"
+		local RETVAL=$?
+		[ $RETVAL -eq 0 ] && echo "Commit hint: ci -m \"Merge from $banch\""
 	fi
 }
 
